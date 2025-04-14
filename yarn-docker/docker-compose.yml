@@ -1,0 +1,44 @@
+
+services:
+  resourcemanager:
+    build: .
+    container_name: resourcemanager
+    hostname: resourcemanager
+    ports:
+      - "8088:8088"  # YARN Web UI
+    networks:
+      - hadoop-net
+
+  nodemanager1:
+    build: .
+    container_name: nodemanager1
+    hostname: nodemanager1
+    depends_on:
+      - resourcemanager
+
+    networks:
+      - hadoop-net
+
+  nodemanager2:
+    build: .
+    container_name: nodemanager2
+    hostname: nodemanager2
+    depends_on:
+      - resourcemanager
+    networks:
+      - hadoop-net
+
+  jobhistory:
+    build: .
+    container_name: jobhistory
+    hostname: jobhistory
+    ports:
+      - "19888:19888"  # MR JobHistory UI
+    depends_on:
+      - resourcemanager
+    networks:
+      - hadoop-net
+
+networks:
+  hadoop-net:
+    external: true

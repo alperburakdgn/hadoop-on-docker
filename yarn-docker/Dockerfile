@@ -20,10 +20,16 @@ ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$JAVA_HOME/bin
 # Kullanıcı oluştur
 RUN groupadd -r hadoop && useradd -ms /bin/bash -g hadoop hadoop
 
-# Dizin izinleri
-RUN mkdir -p /hadoop/dfs/name /hadoop/dfs/data /run/sshd && \
-    chown -R hadoop:hadoop /opt/hadoop /hadoop /home/hadoop && \
-    chmod 755 /run/sshd
+# SSH ve izin ayarları
+RUN mkdir -p /run/sshd && chmod 755 /run/sshd && \
+    chown -R hadoop:hadoop /opt/hadoop /home/hadoop
 
-# Kullanıcıya geç
+# Hadoop konfigürasyonları ve entrypoint
+COPY config/* $HADOOP_HOME/etc/hadoop/
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown hadoop:hadoop /entrypoint.sh
+
+# hadoop kullanıcısına geç
 USER hadoop
+
+CMD ["/entrypoint.sh"]
